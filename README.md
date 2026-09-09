@@ -4,6 +4,8 @@ A small, focused Spring Boot REST API that stores JSON records in PostgreSQL and
 
 The idea is simple: you can drop any JSON object into a named "dataset", and then ask the API to group or sort those records by whatever field makes sense for your data. Because the fields are passed as query parameters, the same API works for an employee dataset, a product catalog, a transactions log — anything that is essentially a list of JSON objects.
 
+> **🚀 Live API:** [https://json-dataset-api.onrender.com](https://json-dataset-api.onrender.com) — deployed on Render (Docker) with a Neon PostgreSQL database. You can call it right now, no setup needed.
+
 ## Why This Exists
 
 Most CRUD backends hardcode a fixed schema. If you suddenly need to group a list of people by their city instead of their department, you have to change code. This project avoids that friction: the dataset stores records as **JSONB**, and grouping/sorting happens on the fly against the JSON itself. No schema change, no code change — just a different query parameter.
@@ -226,7 +228,7 @@ The test suite covers service-level and controller-level behavior:
 ### 1. Insert a record
 
 - **Method:** `POST`
-- **URL:** `https://<your-app>.onrender.com/api/dataset/employee_dataset/record`
+- **URL:** `https://json-dataset-api.onrender.com/api/dataset/employee_dataset/record`
 - **Headers:** `Content-Type: application/json`
 - **Body (raw JSON):**
 
@@ -244,12 +246,12 @@ Add a few more records with different `department`, `age`, `name` values.
 ### 2. Query with group-by
 
 - **Method:** `GET`
-- **URL:** `https://<your-app>.onrender.com/api/dataset/employee_dataset/query?groupBy=department`
+- **URL:** `https://json-dataset-api.onrender.com/api/dataset/employee_dataset/query?groupBy=department`
 
 ### 3. Query with sort-by
 
 - **Method:** `GET`
-- **URL:** `https://<your-app>.onrender.com/api/dataset/employee_dataset/query?sortBy=age&order=asc`
+- **URL:** `https://json-dataset-api.onrender.com/api/dataset/employee_dataset/query?sortBy=age&order=asc`
 
 Try `order=desc`, or sort by another field such as `name`.
 
@@ -277,7 +279,7 @@ This project ships with a **`Dockerfile`** and a **`render.yaml`** blueprint, so
    | `DATABASE_PASSWORD`  | `<your-neon-password>`                 |
 
 5. Click **Apply**. Render builds the container from the `Dockerfile` and deploys your app.
-6. The app is now live at `https://<your-app>.onrender.com`.
+6. The app is now live at `https://<your-app>.onrender.com` (for this project: `https://json-dataset-api.onrender.com`).
 
 Render sets the `PORT` environment variable automatically — no configuration needed. The multi-stage `Dockerfile` compiles the project with Maven and runs the resulting JAR on a Java 21 runtime.
 
@@ -290,7 +292,31 @@ Render sets the `PORT` environment variable automatically — no configuration n
 
 ## Live API
 
-Once deployed, replace `https://<your-app>.onrender.com` in the Postman examples with your actual Render URL. A recruiter can call the API directly with no local setup.
+The application is deployed and running at **https://json-dataset-api.onrender.com** (Render + Neon PostgreSQL). You can call it directly — a recruiter needs no local setup:
+
+### Live test
+
+Insert a record:
+
+```bash
+curl -X POST https://json-dataset-api.onrender.com/api/dataset/employee_dataset/record \
+  -H "Content-Type: application/json" \
+  -d '{"id":1,"name":"John Doe","age":30,"department":"Engineering"}'
+```
+
+Group by department:
+
+```bash
+curl "https://json-dataset-api.onrender.com/api/dataset/employee_dataset/query?groupBy=department"
+```
+
+Sort by age ascending:
+
+```bash
+curl "https://json-dataset-api.onrender.com/api/dataset/employee_dataset/query?sortBy=age&order=asc"
+```
+
+> **Free-tier note:** Render's free plan puts the server to sleep after ~15 minutes of inactivity. The first request after a sleep may take 30–60 seconds to "cold start" while it wakes up, then it responds normally.
 
 ## A Note on Scope
 
