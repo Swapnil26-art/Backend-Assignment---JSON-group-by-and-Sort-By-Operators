@@ -24,6 +24,7 @@ Most CRUD backends hardcode a fixed schema. If you suddenly need to group a list
 - **PostgreSQL** — relational database with `JSONB` column
 - **Maven** — build tool
 - **JUnit 5 / Mockito** — testing
+- **Docker** — containerized deployment (see `Dockerfile` + `render.yaml`)
 
 ## Project Structure
 
@@ -262,11 +263,12 @@ Try `order=desc`, or sort by another field such as `name`.
 
 ### 2. Deploy the application on Render
 
+This project ships with a **`Dockerfile`** and a **`render.yaml`** blueprint, so deployment is automatic and reproducible.
+
 1. Push this repository to a public GitHub repository.
 2. Sign up at [render.com](https://render.com) and connect your GitHub account.
-3. Click **New → Web Service** and select this repository.
-4. Render detects the Java/Spring Boot runtime automatically (uses Maven).
-5. Add these **environment variables**:
+3. Click **New → Blueprint** and select this repository (Render reads the `render.yaml` file).
+4. When prompted, set these **environment variables** (leave the values blank — Render will ask you for them):
 
    | Key                  | Value                                  |
    |----------------------|----------------------------------------|
@@ -274,10 +276,10 @@ Try `order=desc`, or sort by another field such as `name`.
    | `DATABASE_USERNAME`  | `<your-neon-username>`                 |
    | `DATABASE_PASSWORD`  | `<your-neon-password>`                 |
 
-6. Click **Create Web Service**. Render builds and deploys your app.
-7. The app is now live at `https://<your-app>.onrender.com`.
+5. Click **Apply**. Render builds the container from the `Dockerfile` and deploys your app.
+6. The app is now live at `https://<your-app>.onrender.com`.
 
-Render sets the `PORT` environment variable automatically — no configuration needed.
+Render sets the `PORT` environment variable automatically — no configuration needed. The multi-stage `Dockerfile` compiles the project with Maven and runs the resulting JAR on a Java 21 runtime.
 
 ### 3. Verify
 

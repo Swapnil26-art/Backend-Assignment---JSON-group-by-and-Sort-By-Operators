@@ -1,9 +1,9 @@
 services:
   - type: web
     name: json-dataset-api
-    runtime: java
-    buildCommand: mvn clean package -DskipTests
-    startCommand: java -jar target/json-dataset-api-1.0.0.jar
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         sync: false
